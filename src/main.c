@@ -1,18 +1,23 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <time.h>
 #include <SDL3/SDL.h>
 
-#define WIDTH_GRID 256
-#define HEIGHT_GRID 256
+#define WIDTH_GRID 128
+#define HEIGHT_GRID 128
 uint8_t cells[WIDTH_GRID * HEIGHT_GRID];
 uint8_t cellsFake[WIDTH_GRID * HEIGHT_GRID];
 
 void setAlive(int x, int y)
 {
+    
     if (x < WIDTH_GRID && y < HEIGHT_GRID)
     {
-        cellsFake[x + y * WIDTH_GRID] = 0xFF;
+        int color = rand()%0xFF;
+        if(color == 0)color = 1;
+        cellsFake[x + y * WIDTH_GRID] = color;
     }
 }
 
@@ -32,32 +37,22 @@ void interrogacion()
         {
             int neighbors = 0;
 
-            if (cells[(x - 1) + y * WIDTH_GRID])
-                neighbors++;
-            if (cells[(x - 1) + (y + 1) * WIDTH_GRID])
-                neighbors++;
-            if (cells[x + (y - 1) * WIDTH_GRID])
-                neighbors++;
-            if (cells[(x + 1) + y * WIDTH_GRID])
-                neighbors++;
-            if (cells[(x - 1) + (y - 1) * WIDTH_GRID])
-                neighbors++;
-            if (cells[(x + 1) + (y - 1) * WIDTH_GRID])
-                neighbors++;
-            if (cells[(x + 1) + (y + 1) * WIDTH_GRID])
-                neighbors++;
-            if (cells[x + (y + 1) * WIDTH_GRID])
-                neighbors++;
+            if (cells[(x - 1) + y * WIDTH_GRID])neighbors++;
+            if (cells[(x - 1) + (y + 1) * WIDTH_GRID])neighbors++;
+            if (cells[x + (y - 1) * WIDTH_GRID])neighbors++;
+            if (cells[(x + 1) + y * WIDTH_GRID])neighbors++;
+            if (cells[(x - 1) + (y - 1) * WIDTH_GRID])neighbors++;
+            if (cells[(x + 1) + (y - 1) * WIDTH_GRID])neighbors++;
+            if (cells[(x + 1) + (y + 1) * WIDTH_GRID])neighbors++;
+            if (cells[x + (y + 1) * WIDTH_GRID])neighbors++;
 
             if (cells[x + y * WIDTH_GRID]) // viva
             {
-                if (neighbors < 2 || neighbors > 3)
-                    setDeath(x, y);
+                if (neighbors < 2 || neighbors > 3)setDeath(x, y);
             }
             else // morta
             {
-                if (neighbors == 3)
-                    setAlive(x, y);
+                if (neighbors == 3)setAlive(x, y);
             }
         }
     }
@@ -66,8 +61,8 @@ void interrogacion()
 
 int main()
 {
-    int width = WIDTH_GRID*4;
-    int height = HEIGHT_GRID*4;
+    int width = WIDTH_GRID*10;
+    int height = HEIGHT_GRID*10;
     SDL_InitSubSystem(SDL_INIT_VIDEO);
     SDL_Window *window = SDL_CreateWindow("GameOfLife", width, height, 0);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, NULL);
@@ -115,9 +110,23 @@ int main()
                     resume_pause = !resume_pause;
                     
                 }
-            }
-        }
+                else if (event.key.scancode == SDL_SCANCODE_R)
+                {
+                    memset(cells, 0, WIDTH_GRID*HEIGHT_GRID);
+                    memset(cellsFake, 0, WIDTH_GRID*HEIGHT_GRID);
+                }
+            
+                
+            
 
+               
+                
+
+                
+            }
+            
+        }
+        
         if (resume_pause == true)
         {
             interrogacion();
